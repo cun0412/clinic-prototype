@@ -505,7 +505,7 @@ export default function App() {
             Bài tập nhóm môn Phân tích nghiệp vụ (Business Analysis) • Trường Công nghệ - Đại học Kinh tế Quốc dân (NEU)
           </p>
           <p className="text-[10px] text-slate-400 font-mono">
-            Thực hiện: Nhóm 7 • Sprint Review Interactive Prototype
+            Thực hiện: Nhóm 7
           </p>
         </div>
       </footer>
