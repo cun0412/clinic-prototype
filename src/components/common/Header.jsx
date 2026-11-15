@@ -46,22 +46,27 @@ const NAV_PRIMARY = {
     { view: 'doctor-schedule', label: 'Ca làm việc', icon: Clock,      color: 'text-indigo-600' },
   ],
   admin: [
-    { view: 'analytics', label: 'Báo cáo', icon: BarChart3, color: 'text-teal-600' },
+    { view: 'admin-system', label: 'Quản trị hệ thống (4.1.15)', icon: ShieldCheck, color: 'text-teal-600' },
+    { view: 'analytics',    label: 'Báo cáo & Phân tích BA',     icon: BarChart3,   color: 'text-indigo-600' },
   ],
 };
 
 // Items that live in the hamburger menu (secondary / Could Have)
 const NAV_SECONDARY = {
   patient: [
-    { view: 'payment',               label: 'Thanh toán viện phí',  icon: CreditCard, color: 'text-emerald-600', badge: null },
-    { view: 'emr',                   label: 'Hồ sơ bệnh án (EMR)', icon: FileText,   color: 'text-teal-600',    badge: 'Could Have' },
-    { view: 'bhyt',                  label: 'Tra cứu thẻ BHYT',    icon: ShieldPlus, color: 'text-cyan-600',    badge: 'Could Have' },
-    { view: 'notification-settings', label: 'Cài đặt nhắc lịch',   icon: Settings,   color: 'text-amber-500',   badge: null },
+    { view: 'payment',               label: 'Thanh toán & BHYT (4.1.14)',      icon: CreditCard, color: 'text-emerald-600', badge: '4.1.14' },
+    { view: 'queue',                 label: 'Check-in & Hàng đợi (4.1.13)',    icon: Tv,         color: 'text-indigo-600',  badge: '4.1.13' },
+    { view: 'emr',                   label: 'Hồ sơ bệnh án (EMR)',             icon: FileText,   color: 'text-teal-600',    badge: 'Could Have' },
+    { view: 'bhyt',                  label: 'Tra cứu thẻ BHYT riêng',          icon: ShieldPlus, color: 'text-cyan-600',    badge: 'Could Have' },
+    { view: 'notification-settings', label: 'Cài đặt nhắc lịch',               icon: Settings,   color: 'text-amber-500',   badge: null },
   ],
-  staff:  [],
+  staff:  [
+    { view: 'checkin',               label: 'Check-in & Hàng đợi (4.1.13)',    icon: QrCode,     color: 'text-emerald-600', badge: '4.1.13' },
+  ],
   doctor: [],
   admin:  [
-    { view: 'analytics', label: 'Báo cáo tháng / quý', icon: TrendingUp, color: 'text-cyan-600', badge: 'Could Have' },
+    { view: 'admin-system',          label: 'Quản trị hệ thống & RBAC (4.1.15)', icon: ShieldCheck, color: 'text-teal-600', badge: '4.1.15' },
+    { view: 'analytics',             label: 'Báo cáo tháng / quý',             icon: TrendingUp,  color: 'text-cyan-600',  badge: 'Could Have' },
   ],
 };
 
@@ -70,7 +75,7 @@ const ROLES = [
   { key: 'patient', label: 'Bệnh nhân', defaultView: 'home',                 Icon: User,        active: 'bg-white text-teal-700 shadow' },
   { key: 'staff',   label: 'Lễ tân',    defaultView: 'reception-dashboard',   Icon: Users,       active: 'bg-teal-600 text-white shadow' },
   { key: 'doctor',  label: 'Bác sĩ',    defaultView: 'doctor-exam',           Icon: Stethoscope, active: 'bg-indigo-600 text-white shadow' },
-  { key: 'admin',   label: 'Quản lý',   defaultView: 'analytics',             Icon: BarChart3,   active: 'bg-slate-900 text-white shadow' },
+  { key: 'admin',   label: 'Quản lý',   defaultView: 'admin-system',          Icon: BarChart3,   active: 'bg-slate-900 text-white shadow' },
 ];
 
 export default function Header({ 

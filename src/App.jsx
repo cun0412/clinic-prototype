@@ -12,16 +12,18 @@ import StaffTimetableView from './components/staff/StaffTimetableView';
 import CheckInView from './components/staff/CheckInView';
 import NotificationsDrawer from './components/common/NotificationsDrawer';
 
-// Should Have (Screens 11 - 14)
+// Should Have (Screens 11 - 14 & Interfaces 4.1.13, 4.1.14)
 import RealtimeQueueView from './components/patient/RealtimeQueueView';
 import DoctorPortalView from './components/doctor/DoctorPortalView';
 import DoctorScheduleManagementView from './components/doctor/DoctorScheduleManagementView';
 import PaymentBillingView from './components/patient/PaymentBillingView';
+import CheckInAndQueueTrackingView from './components/common/CheckInAndQueueTrackingView';
 
-// Could Have (Screens 15 - 17)
+// Could Have & Admin (Screens 15 - 17 & Interface 4.1.15)
 import EmrRecordsView from './components/patient/EmrRecordsView';
 import InsuranceBhytView from './components/patient/InsuranceBhytView';
 import AnalyticsReportsView from './components/admin/AnalyticsReportsView';
+import SystemAdministrationView from './components/admin/SystemAdministrationView';
 
 import { 
   INITIAL_APPOINTMENTS, 
@@ -214,7 +216,7 @@ export default function App() {
           if (role === 'patient') setCurrentView('home');
           else if (role === 'staff') setCurrentView('reception-dashboard');
           else if (role === 'doctor') setCurrentView('doctor-exam');
-          else if (role === 'admin') setCurrentView('analytics');
+          else if (role === 'admin') setCurrentView('admin-system');
         }}
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -281,15 +283,16 @@ export default function App() {
               />
             )}
 
-            {/* Screen 11: Real-time Patient Queue & TV Hall Display (Should Have) */}
+            {/* Giao diện 4.1.13: Check-in and Real-Time Queue Tracking Interface (FR-12, FR-13, UC-04) */}
             {currentView === 'queue' && (
-              <RealtimeQueueView
+              <CheckInAndQueueTrackingView
                 appointments={appointments}
+                onCheckInSuccess={handleCheckInSuccess}
                 user={user}
               />
             )}
 
-            {/* Screen 14: Payment & E-Receipt (Should Have) */}
+            {/* Giao diện 4.1.14: Payment and Health Insurance Verification Interface (FR-19, FR-20, UC-09) */}
             {currentView === 'payment' && (
               <PaymentBillingView
                 appointment={appointments.find(a => a.id === 'APT-20261115-003') || appointments[0]}
@@ -332,11 +335,12 @@ export default function App() {
               />
             )}
 
-            {/* Screen 10: Patient Check-In & QR Code Scanner */}
+            {/* Giao diện 4.1.13: Check-in and Real-Time Queue Tracking Interface (FR-12, FR-13, UC-04) */}
             {currentView === 'checkin' && (
-              <CheckInView
+              <CheckInAndQueueTrackingView
                 appointments={appointments}
                 onCheckInSuccess={handleCheckInSuccess}
+                user={user}
               />
             )}
           </>
@@ -366,10 +370,15 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* 4. ADMIN & MANAGEMENT PORTAL VIEWS (Screen 17)            */}
+        {/* 4. ADMIN & MANAGEMENT PORTAL VIEWS (4.1.15 & Screen 17)   */}
         {/* ========================================================= */}
         {currentRole === 'admin' && (
           <>
+            {/* Giao diện 4.1.15: System Administration Interface (FR-18, NFR-01, NFR-03, BR-02) */}
+            {(currentView === 'admin-system' || currentView === 'home') && (
+              <SystemAdministrationView />
+            )}
+
             {/* Screen 17: Management Analytics, KPI & BA Evaluation */}
             {currentView === 'analytics' && (
               <AnalyticsReportsView />
