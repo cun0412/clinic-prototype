@@ -447,7 +447,7 @@ export default function Header({
                   {/* Footer hint */}
                   <div className="px-3.5 py-2 bg-slate-50 flex items-center justify-between text-[10px] text-slate-400 font-medium">
                     <span>MediFlow Clinic</span>
-                    <span>Bài tập nhóm BA · NEU</span>
+                    <span>Nhóm 7 · BA NEU</span>
                   </div>
 
                 </div>
