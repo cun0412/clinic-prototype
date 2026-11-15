@@ -21,8 +21,11 @@ import {
   Home,
   QrCode,
   Settings,
-  TrendingUp
+  TrendingUp,
+  Search,
+  Building2
 } from 'lucide-react';
+import { DOCTORS, DEPARTMENTS } from '../../mockData';
 
 // ── Helper: menu items per role ───────────────────────────────────────────────
 const NAV_PRIMARY = {
@@ -81,18 +84,49 @@ export default function Header({
   onOpenNotifications
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
 
   // Close on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Search results
+  const q = searchQuery.trim().toLowerCase();
+  const matchedDoctors = q.length >= 1
+    ? DOCTORS.filter(d =>
+        d.name.toLowerCase().includes(q) ||
+        d.departmentName.toLowerCase().includes(q) ||
+        d.title.toLowerCase().includes(q)
+      ).slice(0, 4)
+    : [];
+  const matchedDepts = q.length >= 1
+    ? DEPARTMENTS.filter(d =>
+        d.name.toLowerCase().includes(q) ||
+        d.description.toLowerCase().includes(q)
+      ).slice(0, 3)
+    : [];
+  const hasResults = matchedDoctors.length > 0 || matchedDepts.length > 0;
+
+  const handleSearchSelect = (type, item) => {
+    setSearchQuery('');
+    setSearchOpen(false);
+    if (type === 'doctor') {
+      setCurrentRole('patient');
+      setCurrentView('booking');
+    } else {
+      setCurrentRole('patient');
+      setCurrentView('booking');
+    }
+  };
 
   const primary   = NAV_PRIMARY[currentRole]   || [];
   const secondary = NAV_SECONDARY[currentRole] || [];
@@ -152,6 +186,121 @@ export default function Header({
               </button>
             ))}
           </nav>
+
+          {/* ── SEARCH BOX ───────────────────────────────────── */}
+          <div className="relative hidden md:block" ref={searchRef}>
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all ${
+              searchOpen
+                ? 'border-teal-400 ring-2 ring-teal-100 bg-white w-56'
+                : 'border-slate-200 bg-slate-50 hover:border-slate-300 w-44'
+            }`}>
+              <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <input
+                type="text"
+                placeholder="Tìm bác sĩ, chuyên khoa…"
+                value={searchQuery}
+                onFocus={() => setSearchOpen(true)}
+                onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+                className="bg-transparent text-xs text-slate-700 placeholder:text-slate-400 outline-none w-full"
+              />
+              {searchQuery && (
+                <button onClick={() => { setSearchQuery(''); }} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Search Dropdown */}
+            {searchOpen && (
+              <div className="absolute left-0 top-full mt-2 w-72 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                
+                {/* Empty state */}
+                {!q && (
+                  <div className="p-4 space-y-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Gợi ý tìm kiếm</p>
+                    {[
+                      { label: 'Tim Mạch', sub: 'Chuyên khoa' },
+                      { label: 'BS Nguyễn Văn An', sub: 'Nội Tổng Quát' },
+                      { label: 'Nhi Khoa', sub: 'Chuyên khoa' },
+                      { label: 'BS Lê Hoàng Nam', sub: 'Tim Mạch' },
+                    ].map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSearchQuery(s.label)}
+                        className="w-full flex items-center gap-2 text-left hover:bg-slate-50 rounded-lg px-2 py-1.5 transition-colors"
+                      >
+                        <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-sm text-slate-700">{s.label}</span>
+                        <span className="text-xs text-slate-400 ml-auto">{s.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Results */}
+                {q && (
+                  <div className="p-2">
+                    {/* Doctors */}
+                    {matchedDoctors.length > 0 && (
+                      <div>
+                        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Bác sĩ</p>
+                        {matchedDoctors.map(doc => (
+                          <button
+                            key={doc.id}
+                            onClick={() => handleSearchSelect('doctor', doc)}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-teal-50 transition-colors text-left"
+                          >
+                            <img src={doc.avatar} alt={doc.name} className="w-8 h-8 rounded-lg object-cover shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-slate-800 truncate">{doc.name}</p>
+                              <p className="text-xs text-slate-500 truncate">{doc.departmentName} · ⭐ {doc.rating}</p>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Departments */}
+                    {matchedDepts.length > 0 && (
+                      <div>
+                        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Chuyên khoa</p>
+                        {matchedDepts.map(dept => (
+                          <button
+                            key={dept.id}
+                            onClick={() => handleSearchSelect('dept', dept)}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-teal-50 transition-colors text-left"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center shrink-0">
+                              <Building2 className="w-4 h-4 text-teal-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-slate-800 truncate">{dept.name}</p>
+                              <p className="text-xs text-slate-500 truncate">{dept.doctorsCount} bác sĩ</p>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* No result */}
+                    {!hasResults && (
+                      <div className="py-6 text-center">
+                        <Search className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                        <p className="text-sm text-slate-400">Không tìm thấy kết quả cho "<span className="font-semibold text-slate-600">{q}</span>"</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="border-t border-slate-100 px-4 py-2 bg-slate-50">
+                  <p className="text-[10px] text-slate-400">Nhấn kết quả để đặt lịch khám</p>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* ── RIGHT CLUSTER ────────────────────────────────────── */}
           <div className="flex items-center gap-1.5">
