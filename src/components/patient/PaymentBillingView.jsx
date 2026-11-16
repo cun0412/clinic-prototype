@@ -83,34 +83,29 @@ export default function PaymentBillingView({ appointment, onPaymentSuccess }) {
       
       {/* Header */}
       <div className="pb-6 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
-            Giao diện 4.1.14
-          </span>
-          <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
-            Payment and Health Insurance Verification Interface
-          </span>
-        </div>
+        <span className="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+          Cổng Viện Phí & Bảo Hiểm Y Tế
+        </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
           Xác Thực Thẻ BHYT & Thanh Toán Viện Phí Điện Tử
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-          Tra cứu xác thực thẻ BHYT qua Cổng giám định BHXH (FR-20), tự động tính toán đồng chi trả (Copayment), tích hợp cổng thanh toán trực tuyến và phát hành hóa đơn điện tử E-Receipt (FR-19, UC-09).
+          Tra cứu xác thực thẻ BHYT trực tuyến, tự động tính toán số tiền đồng chi trả, hỗ trợ đa dạng phương thức thanh toán bảo mật và xuất hóa đơn điện tử.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: BHYT Verification + Payment Gateway (FR-20, FR-19) */}
+        {/* Left Column: BHYT Verification + Payment Gateway */}
         <div className="lg:col-span-7 space-y-6">
           
-          {/* 1. HEALTH INSURANCE VERIFICATION PORTAL (FR-20) */}
+          {/* 1. HEALTH INSURANCE VERIFICATION PORTAL */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <ShieldPlus className="w-5 h-5 text-cyan-600" />
                 <h3 className="font-extrabold text-slate-900 text-sm">
-                  1. Tra Cứu & Xác Thực Thẻ BHYT (Cổng BHXH điện tử - FR-20)
+                  1. Tra cứu & Xác thực thẻ BHYT
                 </h3>
               </div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">

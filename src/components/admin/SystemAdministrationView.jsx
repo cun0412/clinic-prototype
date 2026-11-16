@@ -131,19 +131,14 @@ export default function SystemAdministrationView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
-              Giao diện 4.1.15
-            </span>
-            <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
-              System Administration Interface
-            </span>
-          </div>
+          <span className="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+            Cổng Quản Trị Hệ Thống
+          </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-            Quản Trị Hệ Thống & Bảo Mật RBAC
+            Quản Trị Hệ Thống & Bảo Mật Vận Hành
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Phân quyền vai trò (RBAC), quản lý tài khoản nhân viên, cấu hình tham số thời lượng khám, mốc nhắc lịch (BR-02) và giám sát nhật ký an ninh (FR-18, NFR-01, NFR-03).
+            Phân quyền vai trò người dùng, quản lý tài khoản nhân viên, cấu hình tham số thời lượng khám, mốc gửi thông báo nhắc lịch và giám sát nhật ký an ninh hệ thống.
           </p>
         </div>
 
@@ -167,7 +162,7 @@ export default function SystemAdministrationView() {
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>Tài khoản Nhân viên & Phân quyền RBAC</span>
+          <span>Tài khoản nhân viên & Phân quyền</span>
           <span className="px-2 py-0.5 rounded-full text-[11px] bg-teal-100 text-teal-800 font-bold">
             {staffAccounts.length}
           </span>
@@ -182,7 +177,7 @@ export default function SystemAdministrationView() {
           }`}
         >
           <Sliders className="w-4 h-4" />
-          <span>Cấu hình Tham số Nghiệp vụ (BR-02)</span>
+          <span>Cấu hình tham số vận hành</span>
         </button>
 
         <button
@@ -194,7 +189,7 @@ export default function SystemAdministrationView() {
           }`}
         >
           <ShieldAlert className="w-4 h-4 text-amber-600" />
-          <span>Nhật ký An ninh & Audit Logs (NFR-03)</span>
+          <span>Nhật ký an ninh & Audit logs</span>
           <span className="px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800 font-bold">
             {auditLogs.length}
           </span>
@@ -345,7 +340,7 @@ export default function SystemAdministrationView() {
           {configSavedToast && (
             <div className="p-4 rounded-2xl bg-slate-900 border border-teal-500 text-white flex items-center gap-3 text-xs font-bold shadow-lg animate-in slide-in-from-top-2">
               <CheckCircle2 className="w-5 h-5 text-teal-400 shrink-0" />
-              <span>Đã lưu thành công tham số cấu hình hệ thống và mốc thời gian khám bệnh (BR-02)!</span>
+              <span>Đã lưu thành công tham số cấu hình hệ thống và mốc thời gian khám bệnh!</span>
             </div>
           )}
 

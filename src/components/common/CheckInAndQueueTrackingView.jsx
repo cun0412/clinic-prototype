@@ -25,23 +25,15 @@ export default function CheckInAndQueueTrackingView({ appointments, onCheckInSuc
   return (
     <div className="space-y-6">
       
-      {/* Top Banner indicating 4.1.13 alignment */}
+      {/* Top Banner */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
         <div className="bg-gradient-to-r from-teal-900 via-slate-900 to-indigo-950 text-white rounded-3xl p-5 sm:p-6 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-left">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30 font-mono">
-                Giao diện 4.1.13
-              </span>
-              <span className="text-xs font-semibold text-slate-300">
-                Check-in and Real-Time Queue Tracking Interface
-              </span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-white">
-              Đón Tiếp Check-in & Giám Sát Hàng Đợi Thời Gian Thực
+              Đón Tiếp Check-in & Giám Sát Hàng Đợi Trực Tiếp
             </h2>
             <p className="text-xs text-slate-300 max-w-2xl">
-              Tích hợp quét mã QR/mã đặt hẹn tại quầy lễ tân (FR-12) cùng bảng điện tử hàng đợi trực tiếp hiển thị số đang khám, vị trí xếp hàng và thời gian chờ ước tính (FR-13, UC-04).
+              Theo dõi số thứ tự đang khám, thời gian chờ ước tính thời gian thực hoặc chuyển sang chế độ quét mã QR đón tiếp người bệnh tại quầy.
             </p>
           </div>
 
@@ -56,7 +48,7 @@ export default function CheckInAndQueueTrackingView({ appointments, onCheckInSuc
               }`}
             >
               <Tv className="w-4 h-4" />
-              <span>Bảng Hàng Đợi Real-time (FR-13)</span>
+              <span>Bảng hàng đợi trực tiếp</span>
             </button>
 
             <button
@@ -68,7 +60,7 @@ export default function CheckInAndQueueTrackingView({ appointments, onCheckInSuc
               }`}
             >
               <QrCode className="w-4 h-4" />
-              <span>Quét QR Check-in (FR-12)</span>
+              <span>Quét mã QR Check-in</span>
             </button>
           </div>
         </div>
