@@ -14,6 +14,7 @@ import {
   CreditCard,
   FileText,
   ShieldPlus,
+  ShieldCheck,
   Tv,
   Menu,
   X,
