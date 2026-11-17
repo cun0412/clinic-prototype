@@ -12,13 +12,105 @@ import {
   Sparkles,
   ArrowUpRight,
   PieChart,
-  Check
+  Check,
+  Stethoscope,
+  DollarSign,
+  FileText,
+  ChevronDown
 } from 'lucide-react';
-import { MOCK_ANALYTICS } from '../../mockData';
+import { MOCK_ANALYTICS, DEPARTMENTS, DOCTORS } from '../../mockData';
+
+// Mock data for doctor workload table (5 doctors)
+const DOCTOR_WORKLOAD = [
+  {
+    name: 'BS.CKII Nguyễn Văn An',
+    department: 'Nội Tổng Quát',
+    totalSlots: 120,
+    filled: 112,
+    utilization: 93.3,
+    completed: 108,
+    cancelled: 4,
+    noShow: 2,
+    avgWait: 11,
+    trend: '+5%',
+    trendUp: true
+  },
+  {
+    name: 'ThS.BS Trần Thị Mai Hương',
+    department: 'Nhi Khoa',
+    totalSlots: 100,
+    filled: 97,
+    utilization: 97.0,
+    completed: 93,
+    cancelled: 2,
+    noShow: 2,
+    avgWait: 9,
+    trend: '+12%',
+    trendUp: true
+  },
+  {
+    name: 'PGS.TS Lê Hoàng Dũng',
+    department: 'Tim Mạch',
+    totalSlots: 80,
+    filled: 68,
+    utilization: 85.0,
+    completed: 65,
+    cancelled: 3,
+    noShow: 3,
+    avgWait: 15,
+    trend: '-2%',
+    trendUp: false
+  },
+  {
+    name: 'BS Phạm Thùy Linh',
+    department: 'Da Liễu & Thẩm Mỹ',
+    totalSlots: 90,
+    filled: 87,
+    utilization: 96.7,
+    completed: 84,
+    cancelled: 1,
+    noShow: 2,
+    avgWait: 8,
+    trend: '+8%',
+    trendUp: true
+  },
+  {
+    name: 'BS Hoàng Minh Tuấn',
+    department: 'Tai Mũi Họng',
+    totalSlots: 70,
+    filled: 56,
+    utilization: 80.0,
+    completed: 52,
+    cancelled: 2,
+    noShow: 4,
+    avgWait: 18,
+    trend: '-1%',
+    trendUp: false
+  }
+];
+
+// Revenue mock data
+const REVENUE_DATA = {
+  gross: 294500000,
+  insurance: 180400000,
+  net: 114100000
+};
+
+const formatVND = (amount) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(amount);
 
 export default function AnalyticsReportsView() {
   const [period, setPeriod] = useState('month'); // 'week' | 'month' | 'quarter'
+  const [deptFilter, setDeptFilter] = useState('all');
+  const [doctorFilter, setDoctorFilter] = useState('all');
   const data = MOCK_ANALYTICS;
+
+  // Filter workload table
+  const filteredWorkload = DOCTOR_WORKLOAD.filter(d => {
+    const matchesDept = deptFilter === 'all' || d.department === deptFilter;
+    const matchesDoctor = doctorFilter === 'all' || d.name === doctorFilter;
+    return matchesDept && matchesDoctor;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left">
@@ -37,7 +129,8 @@ export default function AnalyticsReportsView() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Period selector */}
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
@@ -48,6 +141,40 @@ export default function AnalyticsReportsView() {
             <option value="quarter">Quý IV / 2026</option>
           </select>
 
+          {/* Department filter */}
+          <select
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:ring-2 focus:ring-teal-500 shadow-xs"
+          >
+            <option value="all">Tất cả chuyên khoa</option>
+            {DEPARTMENTS.map(d => (
+              <option key={d.id} value={d.name}>{d.name}</option>
+            ))}
+          </select>
+
+          {/* Doctor filter */}
+          <select
+            value={doctorFilter}
+            onChange={(e) => setDoctorFilter(e.target.value)}
+            className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:ring-2 focus:ring-teal-500 shadow-xs"
+          >
+            <option value="all">Tất cả bác sĩ</option>
+            {DOCTOR_WORKLOAD.map(d => (
+              <option key={d.name} value={d.name}>{d.name}</option>
+            ))}
+          </select>
+
+          {/* PDF Export button */}
+          <button
+            onClick={() => alert('Đang xuất tệp báo cáo PDF...')}
+            className="px-4 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs shadow-xs transition-all flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Xuất PDF</span>
+          </button>
+
+          {/* Excel Export button */}
           <button
             onClick={() => alert('Đang xuất tệp báo cáo tổng hợp Excel (.xlsx)...')}
             className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all flex items-center gap-2"
@@ -58,10 +185,10 @@ export default function AnalyticsReportsView() {
         </div>
       </div>
 
-      {/* KPI METRICS OVERVIEW */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* KPI METRICS OVERVIEW – 6 cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         
-        {/* Total Bookings */}
+        {/* KPI 1: Total Bookings */}
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold text-slate-400 uppercase">Tổng lượt đặt khám</span>
@@ -73,34 +200,96 @@ export default function AnalyticsReportsView() {
           <p className="text-[10px] text-slate-500">So với tháng trước (711 ca)</p>
         </div>
 
-        {/* Completed Rate */}
+        {/* KPI 2: Completed Rate */}
         <div className="bg-white p-5 rounded-3xl border border-emerald-200 bg-emerald-50/20 shadow-xs space-y-1">
           <span className="text-[10px] font-bold text-emerald-700 uppercase">Tỷ lệ khám thành công</span>
           <div className="text-3xl font-black text-emerald-800">{data.summary.completedRate}%</div>
           <p className="text-[10px] text-emerald-600">Đạt chỉ tiêu vận hành &gt; 90%</p>
         </div>
 
-        {/* Cancellation Rate */}
+        {/* KPI 3: Cancellation Rate */}
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase">Tỷ lệ hủy lịch tự phục vụ</span>
           <div className="text-3xl font-black text-slate-800">{data.summary.cancellationRate}%</div>
           <p className="text-[10px] text-slate-500">Được hủy trước &gt; 2 giờ</p>
         </div>
 
-        {/* No-show Rate */}
+        {/* KPI 4: No-show Rate */}
         <div className="bg-white p-5 rounded-3xl border border-rose-200 bg-rose-50/20 shadow-xs space-y-1">
           <span className="text-[10px] font-bold text-rose-700 uppercase">Tỷ lệ vắng mặt (No-show)</span>
           <div className="text-3xl font-black text-rose-700">{data.summary.noShowRate}%</div>
           <p className="text-[10px] text-emerald-600 font-semibold">Giảm mạnh nhờ SMS nhắc 24h & 1h</p>
         </div>
 
-        {/* Avg Wait Time */}
+        {/* KPI 5: Avg Wait Time */}
         <div className="bg-white p-5 rounded-3xl border border-teal-200 bg-teal-50/20 shadow-xs space-y-1">
           <span className="text-[10px] font-bold text-teal-700 uppercase">Thời gian chờ bình quân</span>
           <div className="text-3xl font-black text-teal-800">{data.summary.avgWaitTimeMinutes} phút</div>
           <p className="text-[10px] text-teal-600 font-medium">Giảm 65% so với mô hình cũ</p>
         </div>
 
+        {/* KPI 6 (NEW): Doctor Workload Utilization */}
+        <div className="bg-white p-5 rounded-3xl border border-indigo-200 bg-indigo-50/20 shadow-xs space-y-1">
+          <span className="text-[10px] font-bold text-indigo-700 uppercase">Hiệu suất bác sĩ</span>
+          <div className="text-3xl font-black text-indigo-800">90.4%</div>
+          <p className="text-[10px] text-indigo-600 font-medium">Trung bình slot đã lấp đầy</p>
+        </div>
+
+      </div>
+
+      {/* REVENUE SECTION (KPI 6 detail) */}
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white">
+        <div className="flex items-center gap-2 mb-5">
+          <DollarSign className="w-5 h-5 text-emerald-400" />
+          <h3 className="font-extrabold text-sm text-emerald-400 uppercase tracking-wide">
+            Doanh thu Thu tiền Khám (Tháng 11/2026)
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Gross revenue */}
+          <div className="p-5 rounded-2xl bg-slate-700/60 border border-slate-600 space-y-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Tổng phí khám (Gross)</span>
+            <div className="text-xl sm:text-2xl font-black text-white">
+              {formatVND(REVENUE_DATA.gross)}
+            </div>
+            <p className="text-[11px] text-slate-400">Tổng phí trước khi trừ bảo hiểm</p>
+          </div>
+
+          {/* Insurance covered */}
+          <div className="p-5 rounded-2xl bg-blue-900/40 border border-blue-700/40 space-y-2">
+            <span className="text-[10px] font-bold text-blue-300 uppercase">Bảo hiểm chi trả (Mô phỏng)</span>
+            <div className="text-xl sm:text-2xl font-black text-blue-300">
+              {formatVND(REVENUE_DATA.insurance)}
+            </div>
+            <p className="text-[11px] text-blue-400/80">Phần BHYT thanh toán cho phòng khám</p>
+          </div>
+
+          {/* Net revenue */}
+          <div className="p-5 rounded-2xl bg-emerald-900/40 border border-emerald-500/40 space-y-2">
+            <span className="text-[10px] font-bold text-emerald-300 uppercase">Doanh thu thực thu (Net)</span>
+            <div className="text-xl sm:text-2xl font-black text-emerald-300">
+              {formatVND(REVENUE_DATA.net)}
+            </div>
+            <p className="text-[11px] text-emerald-400/80">Gross − Bảo hiểm = Tiền mặt thực thu</p>
+          </div>
+        </div>
+
+        {/* Revenue progress bar */}
+        <div className="mt-5 space-y-2">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-400">Tỷ lệ bảo hiểm / gross revenue</span>
+            <span className="font-bold text-blue-300">
+              {((REVENUE_DATA.insurance / REVENUE_DATA.gross) * 100).toFixed(1)}%
+            </span>
+          </div>
+          <div className="w-full h-2.5 rounded-full bg-slate-700 overflow-hidden">
+            <div
+              style={{ width: `${(REVENUE_DATA.insurance / REVENUE_DATA.gross) * 100}%` }}
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-teal-400"
+            />
+          </div>
+        </div>
       </div>
 
       {/* CHARTS SECTION */}
@@ -175,7 +364,107 @@ export default function AnalyticsReportsView() {
 
       </div>
 
-      {/* BA STRATEGIC INSIGHTS BOX (ĐẶC SẮC MÔN PHÂN TÍCH NGHIỆP VỤ) */}
+      {/* DOCTOR WORKLOAD TABLE */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+        
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <Stethoscope className="w-4 h-4 text-indigo-600" />
+              <h3 className="font-extrabold text-slate-900 text-sm">
+                Bảng Hiệu suất Bác sĩ (Doctor Workload Utilization)
+              </h3>
+            </div>
+            <p className="text-[11px] text-slate-500">Tỷ lệ lấp đầy slot, tỷ lệ hoàn tất và thời gian chờ bình quân theo bác sĩ</p>
+          </div>
+          <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200">
+            {filteredWorkload.length} bác sĩ
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-600">
+            <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <tr>
+                <th className="py-3 px-5">Bác sĩ</th>
+                <th className="py-3 px-4">Chuyên khoa</th>
+                <th className="py-3 px-4 text-center">Tổng slot</th>
+                <th className="py-3 px-4 text-center">Đã lấp đầy</th>
+                <th className="py-3 px-4 text-center">Hiệu suất (%)</th>
+                <th className="py-3 px-4 text-center">Hoàn tất</th>
+                <th className="py-3 px-4 text-center">Hủy / Vắng</th>
+                <th className="py-3 px-4 text-center">T.gian chờ</th>
+                <th className="py-3 px-4 text-center">Xu hướng</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredWorkload.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="py-10 text-center text-slate-400 text-xs">
+                    Không có dữ liệu phù hợp với bộ lọc.
+                  </td>
+                </tr>
+              )}
+              {filteredWorkload.map((doc, idx) => (
+                <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <div className="font-bold text-slate-900">{doc.name}</div>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                      {doc.department}
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4 text-center font-semibold text-slate-700">{doc.totalSlots}</td>
+                  <td className="py-3.5 px-4 text-center font-semibold text-slate-700">{doc.filled}</td>
+                  <td className="py-3.5 px-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <span className={`font-black text-sm ${doc.utilization >= 90 ? 'text-emerald-700' : doc.utilization >= 80 ? 'text-amber-600' : 'text-rose-600'}`}>
+                        {doc.utilization.toFixed(1)}%
+                      </span>
+                      <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden max-w-[80px]">
+                        <div
+                          style={{ width: `${doc.utilization}%` }}
+                          className={`h-full rounded-full ${doc.utilization >= 90 ? 'bg-emerald-500' : doc.utilization >= 80 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4 text-center">
+                    <span className="font-bold text-slate-800">{doc.completed}</span>
+                  </td>
+                  <td className="py-3.5 px-4 text-center">
+                    <span className="text-rose-600 font-semibold">{doc.cancelled}</span>
+                    <span className="text-slate-400 mx-0.5">/</span>
+                    <span className="text-amber-600 font-semibold">{doc.noShow}</span>
+                  </td>
+                  <td className="py-3.5 px-4 text-center font-semibold text-slate-700">
+                    {doc.avgWait} phút
+                  </td>
+                  <td className="py-3.5 px-4 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                      doc.trendUp
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200'
+                    }`}>
+                      {doc.trendUp ? '↑' : '↓'} {doc.trend}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Summary row */}
+        <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center gap-6 text-[11px] text-slate-500 flex-wrap">
+          <span>✅ Hiệu suất &ge; 90%: <strong className="text-emerald-700">{DOCTOR_WORKLOAD.filter(d => d.utilization >= 90).length} BS</strong></span>
+          <span>⚠️ Cần cải thiện (&lt;90%): <strong className="text-amber-700">{DOCTOR_WORKLOAD.filter(d => d.utilization < 90).length} BS</strong></span>
+          <span>Trung bình toàn phòng khám: <strong className="text-indigo-700">90.4%</strong></span>
+        </div>
+      </div>
+
+      {/* BA STRATEGIC INSIGHTS BOX */}
       <div className="p-6 rounded-3xl bg-slate-900 text-white space-y-4 text-xs">
         <div className="flex items-center gap-2 font-bold text-teal-400 text-sm">
           <Sparkles className="w-5 h-5" />

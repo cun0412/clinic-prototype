@@ -398,7 +398,9 @@ export const MOCK_ANALYTICS = {
     cancellationRate: 5.4,
     noShowRate: 3.4,
     avgWaitTimeMinutes: 12.8,
-    peakHour: '08:30 - 10:00'
+    peakHour: '08:30 - 10:00',
+    doctorWorkloadAvg: 88.3,
+    netRevenue: 114100000
   },
   dailyBookings: [
     { day: 'T2 (10/11)', count: 128 },
@@ -415,4 +417,25 @@ export const MOCK_ANALYTICS = {
     { name: 'Tai Mũi Họng', percentage: 14, color: 'bg-emerald-500' },
     { name: 'Da Liễu & Khác', percentage: 8, color: 'bg-purple-500' }
   ]
+};
+
+export const FAMILY_MEMBERS = [
+  { id: 'fm-1', name: 'Bé Nguyễn Minh Triết', relation: 'Con trai', dob: '10/08/2022', gender: 'Nam', bhytCode: 'TE4010203040504' },
+  { id: 'fm-2', name: 'Nguyễn Thị Hoa', relation: 'Mẹ', dob: '12/03/1972', gender: 'Nữ', bhytCode: 'GD4010203040510' },
+];
+
+export const MOCK_DOCTOR_WORKLOAD = [
+  { doctorId: 'doc-1', doctorName: 'BS.CKII Nguyễn Văn An', department: 'Nội Tổng Quát', totalSlots: 120, bookedSlots: 112, utilizationRate: 93.3, revenue: 39200000 },
+  { doctorId: 'doc-2', doctorName: 'ThS.BS Trần Thị Mai Hương', department: 'Nhi Khoa', totalSlots: 100, bookedSlots: 89, utilizationRate: 89.0, revenue: 26700000 },
+  { doctorId: 'doc-3', doctorName: 'PGS.TS.BS Lê Hoàng Nam', department: 'Tim Mạch', totalSlots: 80, bookedSlots: 72, utilizationRate: 90.0, revenue: 36000000 },
+  { doctorId: 'doc-4', doctorName: 'BS.CKI Phạm Quốc Bảo', department: 'Tai Mũi Họng', totalSlots: 90, bookedSlots: 75, utilizationRate: 83.3, revenue: 21000000 },
+  { doctorId: 'doc-5', doctorName: 'BS.CKI Đỗ Thanh Thảo', department: 'Da Liễu & Thẩm Mỹ', totalSlots: 70, bookedSlots: 60, utilizationRate: 85.7, revenue: 19200000 },
+];
+
+export const MOCK_REVENUE = {
+  grossConsultationFees: 294500000,
+  insuranceCovered: 180400000,
+  netRevenue: 114100000,
+  successfulPayments: 768,
+  pendingPayments: 74,
 };

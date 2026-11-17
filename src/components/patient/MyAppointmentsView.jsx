@@ -13,8 +13,28 @@ import {
   FileText,
   ChevronRight,
   Filter,
-  Sparkles
+  Sparkles,
+  Stethoscope,
+  Pill,
+  ClipboardList,
+  CalendarCheck,
+  AlertTriangle
 } from 'lucide-react';
+
+// BR-04: returns true if appointment is more than 2 hours away from now
+function isMoreThan2HoursAway(date, timeSlot) {
+  try {
+    // timeSlot format: "08:30 - 09:00" – use the start time
+    const startTime = timeSlot.split(' - ')[0].trim(); // e.g. "08:30"
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const aptDateTime = new Date(`${date}T${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:00`);
+    const now = new Date();
+    const diffMs = aptDateTime - now;
+    return diffMs > 2 * 60 * 60 * 1000; // > 2 hours in ms
+  } catch {
+    return true; // fail open
+  }
+}
 
 export default function MyAppointmentsView({ 
   appointments, 
@@ -33,10 +53,13 @@ export default function MyAppointmentsView({
   const [newDate, setNewDate] = useState('2026-11-16');
   const [newTimeSlot, setNewTimeSlot] = useState('14:00 - 14:30');
 
+  // EMR view modal state (FR-16)
+  const [emrViewApt, setEmrViewApt] = useState(null);
+
   // Filter appointments
   const upcomingList = appointments.filter(a => ['confirmed', 'checked-in', 'in-progress'].includes(a.status));
   const completedList = appointments.filter(a => a.status === 'completed');
-  const cancelledList = appointments.filter(a => a.status === 'cancelled');
+  const cancelledList = appointments.filter(a => ['cancelled', 'no-show'].includes(a.status));
 
   const currentList = activeTab === 'upcoming' 
     ? upcomingList 
@@ -56,6 +79,50 @@ export default function MyAppointmentsView({
     if (!reschedulingApt) return;
     onRescheduleAppointment(reschedulingApt.id, newDate, newTimeSlot);
     setReschedulingApt(null);
+  };
+
+  // Status badge styling
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'in-progress':
+        return {
+          label: 'Đang trong phòng khám',
+          className: 'bg-purple-100 text-purple-800 border-purple-200',
+          dot: 'bg-purple-500 animate-ping'
+        };
+      case 'checked-in':
+        return {
+          label: 'Đã check-in (Đang chờ)',
+          className: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+          dot: 'bg-emerald-500'
+        };
+      case 'confirmed':
+        return {
+          label: 'Đã xác nhận đặt hẹn',
+          className: 'bg-teal-100 text-teal-800 border-teal-200',
+          dot: 'bg-teal-500'
+        };
+      case 'completed':
+        return {
+          label: 'Đã hoàn tất khám',
+          className: 'bg-slate-100 text-slate-700 border-slate-200',
+          dot: 'bg-slate-400'
+        };
+      case 'cancelled':
+        return {
+          label: 'Đã hủy lịch hẹn',
+          className: 'bg-rose-100 text-rose-800 border-rose-200',
+          dot: 'bg-rose-500'
+        };
+      case 'no-show':
+        return {
+          label: 'Không đến khám (No-show)',
+          className: 'bg-orange-100 text-orange-800 border-orange-200',
+          dot: 'bg-orange-500'
+        };
+      default:
+        return { label: status, className: 'bg-slate-100 text-slate-700 border-slate-200', dot: 'bg-slate-400' };
+    }
   };
 
   return (
@@ -122,7 +189,7 @@ export default function MyAppointmentsView({
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <span>Đã hủy</span>
+          <span>Đã hủy / No-show</span>
           <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-100 text-slate-700 font-bold">
             {cancelledList.length}
           </span>
@@ -149,45 +216,10 @@ export default function MyAppointmentsView({
           </div>
         ) : (
           currentList.map((apt) => {
-            // Status badge styling
-            const getStatusBadge = (status) => {
-              switch (status) {
-                case 'in-progress':
-                  return {
-                    label: 'Đang trong phòng khám',
-                    className: 'bg-purple-100 text-purple-800 border-purple-200',
-                    dot: 'bg-purple-500 animate-ping'
-                  };
-                case 'checked-in':
-                  return {
-                    label: 'Đã check-in (Đang chờ)',
-                    className: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                    dot: 'bg-emerald-500'
-                  };
-                case 'confirmed':
-                  return {
-                    label: 'Đã xác nhận đặt hẹn',
-                    className: 'bg-teal-100 text-teal-800 border-teal-200',
-                    dot: 'bg-teal-500'
-                  };
-                case 'completed':
-                  return {
-                    label: 'Đã hoàn tất khám',
-                    className: 'bg-slate-100 text-slate-700 border-slate-200',
-                    dot: 'bg-slate-400'
-                  };
-                case 'cancelled':
-                  return {
-                    label: 'Đã hủy lịch hẹn',
-                    className: 'bg-rose-100 text-rose-800 border-rose-200',
-                    dot: 'bg-rose-500'
-                  };
-                default:
-                  return { label: status, className: 'bg-slate-100 text-slate-700', dot: 'bg-slate-400' };
-              }
-            };
-
             const badge = getStatusBadge(apt.status);
+            // BR-04: check if appointment is > 2 hours away
+            const canModify = ['confirmed', 'checked-in'].includes(apt.status) && isMoreThan2HoursAway(apt.date, apt.timeSlot);
+            const isUpcomingButTooClose = ['confirmed', 'checked-in'].includes(apt.status) && !isMoreThan2HoursAway(apt.date, apt.timeSlot);
 
             return (
               <div
@@ -255,8 +287,25 @@ export default function MyAppointmentsView({
 
                 </div>
 
-                {/* Bottom Actions for Upcoming Appointments */}
-                {['confirmed', 'checked-in'].includes(apt.status) && (
+                {/* EMR View button for completed appointments (FR-16) */}
+                {apt.status === 'completed' && apt.diagnosis && (
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Khám hoàn tất – Có kết quả chẩn đoán và đơn thuốc</span>
+                    </div>
+                    <button
+                      onClick={() => setEmrViewApt(apt)}
+                      className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+                    >
+                      <ClipboardList className="w-3.5 h-3.5" />
+                      <span>Xem kết quả khám</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Bottom Actions for Upcoming Appointments (BR-04 enforced) */}
+                {canModify && (
                   <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
                     <div className="text-slate-400 text-[11px] flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -286,11 +335,125 @@ export default function MyAppointmentsView({
                   </div>
                 )}
 
+                {/* BR-04: Too close to appointment – show lock message instead of buttons */}
+                {isUpcomingButTooClose && (
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>
+                        <b>Không thể tự đổi/hủy:</b> Lịch hẹn còn dưới 2 giờ nữa. Vui lòng liên hệ lễ tân để được hỗ trợ.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
               </div>
             );
           })
         )}
       </div>
+
+      {/* ============================================================ */}
+      {/* MODAL XEM KẾT QUẢ KHÁM / EMR (FR-16, READ-ONLY)              */}
+      {/* ============================================================ */}
+      {emrViewApt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 text-left space-y-5 max-h-[90vh] overflow-y-auto">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                  <Stethoscope className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">Kết quả khám bệnh</h3>
+                  <p className="text-[11px] text-slate-500 font-mono">{emrViewApt.id} • {emrViewApt.date}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEmrViewApt(null)}
+                className="text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Doctor & Department */}
+            <div className="text-xs text-slate-500 flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-teal-600" />
+              <span className="font-bold text-slate-800">{emrViewApt.doctorName}</span>
+              <span>•</span>
+              <span>{emrViewApt.departmentName}</span>
+            </div>
+
+            {/* Diagnosis */}
+            <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-blue-700 uppercase tracking-wide">
+                <ClipboardList className="w-3.5 h-3.5" />
+                <span>Chẩn đoán y khoa</span>
+              </div>
+              <p className="text-sm font-bold text-slate-900 leading-snug">
+                {emrViewApt.diagnosis}
+              </p>
+            </div>
+
+            {/* Prescription */}
+            {emrViewApt.prescription && emrViewApt.prescription.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <Pill className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Đơn thuốc chỉ định</span>
+                </div>
+                <div className="space-y-2">
+                  {emrViewApt.prescription.map((med, idx) => (
+                    <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                      <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-700 text-[11px] font-black flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <div className="text-xs">
+                        <div className="font-bold text-slate-900">{med.name}</div>
+                        <div className="text-slate-500 mt-0.5">{med.dosage}</div>
+                        <div className="text-teal-700 font-semibold mt-0.5">SL: {med.quantity}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Doctor Notes */}
+            {emrViewApt.doctorNotes && (
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-1">
+                <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wide">Lời dặn của Bác sĩ</div>
+                <p className="text-xs text-amber-900 italic leading-relaxed">"{emrViewApt.doctorNotes}"</p>
+              </div>
+            )}
+
+            {/* Follow-up date */}
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+              <CalendarCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span><b>Lịch tái khám:</b> Tái khám sau 30 ngày</span>
+            </div>
+
+            {/* Read-only notice */}
+            <p className="text-[10px] text-center text-slate-400 italic">
+              Hồ sơ chỉ được xem (read-only). Bảo mật theo chuẩn y tế RBAC.
+            </p>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setEmrViewApt(null)}
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-xs"
+              >
+                Đóng
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* MODAL HỦY LỊCH HẸN (SELF-SERVICE CANCEL WITH REASON) */}

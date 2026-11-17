@@ -32,10 +32,11 @@ import { DOCTORS, DEPARTMENTS } from '../../mockData';
 // ── Helper: menu items per role ───────────────────────────────────────────────
 const NAV_PRIMARY = {
   patient: [
-    { view: 'home',             label: 'Trang chủ', icon: Home,      color: 'text-teal-600' },
-    { view: 'booking',          label: 'Đặt lịch',  icon: Calendar,  color: 'text-teal-600' },
-    { view: 'my-appointments',  label: 'Lịch hẹn',  icon: Clock,     color: 'text-cyan-600' },
-    { view: 'queue',            label: 'Hàng đợi',  icon: Tv,        color: 'text-indigo-600' },
+    { view: 'home',             label: 'Trang chủ', icon: Home,       color: 'text-teal-600' },
+    { view: 'booking',          label: 'Đặt lịch',  icon: Calendar,   color: 'text-teal-600' },
+    { view: 'my-appointments',  label: 'Lịch hẹn',  icon: Clock,      color: 'text-cyan-600' },
+    { view: 'queue',            label: 'Hàng đợi',  icon: Tv,         color: 'text-indigo-600' },
+    { view: 'payment',          label: 'Thanh toán', icon: CreditCard, color: 'text-emerald-600' },
   ],
   staff: [
     { view: 'reception-dashboard', label: 'Dashboard',   icon: LayoutDashboard, color: 'text-teal-600' },
@@ -55,11 +56,12 @@ const NAV_PRIMARY = {
 // Items that live in the hamburger menu (secondary / Could Have)
 const NAV_SECONDARY = {
   patient: [
-    { view: 'payment',               label: 'Thanh toán & BHYT',      icon: CreditCard, color: 'text-emerald-600', badge: null },
-    { view: 'queue',                 label: 'Check-in & Hàng đợi',    icon: Tv,         color: 'text-indigo-600',  badge: null },
-    { view: 'emr',                   label: 'Hồ sơ bệnh án (EMR)',   icon: FileText,   color: 'text-teal-600',    badge: 'Could Have' },
-    { view: 'bhyt',                  label: 'Tra cứu thẻ BHYT riêng', icon: ShieldPlus, color: 'text-cyan-600',    badge: 'Could Have' },
-    { view: 'notification-settings', label: 'Cài đặt nhắc lịch',      icon: Settings,   color: 'text-amber-500',   badge: null },
+    { view: 'patient-profile',       label: 'Hồ sơ cá nhân & Gia đình', icon: User,       color: 'text-teal-600',    badge: null },
+    { view: 'payment',               label: 'Thanh toán & BHYT',         icon: CreditCard, color: 'text-emerald-600', badge: null },
+    { view: 'queue',                 label: 'Check-in & Hàng đợi',       icon: Tv,         color: 'text-indigo-600',  badge: null },
+    { view: 'emr',                   label: 'Hồ sơ bệnh án (EMR)',      icon: FileText,   color: 'text-teal-600',    badge: 'Could Have' },
+    { view: 'bhyt',                  label: 'Tra cứu thẻ BHYT riêng',   icon: ShieldPlus, color: 'text-cyan-600',    badge: 'Could Have' },
+    { view: 'notification-settings', label: 'Cài đặt nhắc lịch',         icon: Settings,   color: 'text-amber-500',   badge: null },
   ],
   staff:  [
     { view: 'checkin',               label: 'Check-in & Hàng đợi',    icon: QrCode,     color: 'text-emerald-600', badge: null },

@@ -25,6 +25,9 @@ import InsuranceBhytView from './components/patient/InsuranceBhytView';
 import AnalyticsReportsView from './components/admin/AnalyticsReportsView';
 import SystemAdministrationView from './components/admin/SystemAdministrationView';
 
+// UI-08: Patient Profile & Family Member Management (FR-02)
+import PatientProfileView from './components/patient/PatientProfileView';
+
 import { 
   INITIAL_APPOINTMENTS, 
   MOCK_NOTIFICATION_SETTINGS, 
@@ -295,8 +298,17 @@ export default function App() {
             {/* Giao diện 4.1.14: Payment and Health Insurance Verification Interface (FR-19, FR-20, UC-09) */}
             {currentView === 'payment' && (
               <PaymentBillingView
-                appointment={appointments.find(a => a.id === 'APT-20261115-003') || appointments[0]}
+                appointments={appointments}
+                appointment={appointments.find(a => a.paymentStatus !== 'paid' && (a.status === 'completed' || a.status === 'checked-in')) || appointments[0]}
                 onPaymentSuccess={handlePaymentSuccess}
+              />
+            )}
+
+            {/* UI-08, FR-02: Patient Profile & Family Management */}
+            {currentView === 'patient-profile' && (
+              <PatientProfileView
+                user={user}
+                onSaveSuccess={() => showToast('Đã lưu hồ sơ cá nhân thành công!', 'success')}
               />
             )}
 
@@ -308,6 +320,14 @@ export default function App() {
             {/* Screen 16: BHYT Health Insurance Lookup (Could Have) */}
             {currentView === 'bhyt' && (
               <InsuranceBhytView />
+            )}
+
+            {/* UI-08: Patient Profile & Family Member Management (FR-02) */}
+            {currentView === 'patient-profile' && (
+              <PatientProfileView
+                user={user}
+                onSaveSuccess={() => showToast('Đã cập nhật hồ sơ cá nhân thành công!', 'success')}
+              />
             )}
           </>
         )}
